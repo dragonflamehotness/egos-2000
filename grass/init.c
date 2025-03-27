@@ -23,6 +23,7 @@ void grass_entry() {
     grass->proc_set_ready = proc_set_ready;
     grass->sys_send       = sys_send;
     grass->sys_recv       = sys_recv;
+    grass->proc_sleep     = proc_sleep;
 
     /* Load the first system server GPID_PROCESS */
     INFO("Load kernel process #%d: sys_process", GPID_PROCESS);

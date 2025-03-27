@@ -23,7 +23,7 @@ enum grass_servers {
 #define CMD_NARGS   16
 #define CMD_ARG_LEN 32
 struct proc_request {
-    enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;
+    enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL, PROC_SLEEP} type;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];
 };

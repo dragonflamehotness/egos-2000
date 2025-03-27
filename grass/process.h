@@ -9,6 +9,7 @@ enum proc_status {
     PROC_READY,   /* finished loading elf and wait for first running */
     PROC_RUNNING,
     PROC_RUNNABLE,
+    PROC_SLEEPING,
     PROC_PENDING_SYSCALL
 };
 
@@ -22,6 +23,7 @@ struct process {
     int pid;
     struct syscall syscall;
     enum proc_status status;
+    int time;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
 
     /* Student's code goes here (preemptive scheduler)

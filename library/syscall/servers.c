@@ -21,6 +21,12 @@ void exit(int status) {
     while (1);
 }
 
+void sleep(int nticks) {
+    struct proc_request req;
+    req.type   = PROC_SLEEP;
+    req.argc = nticks;
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+}
 /* To understand directory management, read tools/mkfs.c */
 int dir_lookup(int dir_ino, char* name) {
     char buf[BLOCK_SIZE];
