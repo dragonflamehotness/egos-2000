@@ -10,6 +10,7 @@
  #include "syscall.h"
  #include <stdlib.h>
  #include <string.h>
+ #include <stdio.h>
  
  static int sender;
  static char buf[SYSCALL_MSG_LEN];
@@ -24,7 +25,7 @@
  void sleep(int nticks) {
      struct proc_request req;
      req.type   = PROC_SLEEP;
-     req.argc = nticks;
+     sprintf(req.argv[0],"%ld", nticks);
      sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
  }
  /* To understand directory management, read tools/mkfs.c */
