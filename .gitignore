@@ -11,3 +11,4 @@ build
 # clangd lsp files
 .cache
 compile_commands.json
+.vscode/settings.json
