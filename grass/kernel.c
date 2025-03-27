@@ -167,7 +167,7 @@
      proc_set_running(curr_pid);
  }
  
- static void proc_sleep(uint pid, uint nticks) {
+ void proc_sleep(uint pid, uint nticks) {
  
      for (uint i = 0; i < MAX_NPROCESS; i++) {
          if (proc_set[i].pid == pid && proc_set[i].status != PROC_UNUSED) {

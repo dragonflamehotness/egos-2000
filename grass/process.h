@@ -37,6 +37,7 @@ void core_set_idle(uint);
 #define MAX_NPROCESS 16
 int proc_alloc();
 void proc_free(int);
+void proc_sleep(int, int);
 void proc_set_ready(int);
 void proc_set_running(int);
 void proc_set_runnable(int);
