@@ -13,9 +13,7 @@ enum proc_status {
     PROC_PENDING_SYSCALL
 };
 
-#define SAVED_REGISTER_NUM (32 - 3)
-/* zero, gp and tp are the 3 registers not saved */
-/* zero is always zero; gp/tp are not used in egos-2000 */
+#define SAVED_REGISTER_NUM  32
 #define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * 4
 #define SAVED_REGISTER_ADDR (void*)(EGOS_STACK_TOP - SAVED_REGISTER_SIZE)
 
@@ -26,8 +24,9 @@ struct process {
     int time;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
 
-    /* Student's code goes here (preemptive scheduler)
-     * Create data structures that hold scheduling information. */
+    /* Student's code goes here (Preemptive Scheduler). */
+
+    /* Create data structures that hold scheduling information. */
 
     /* Student's code ends here. */
 };
