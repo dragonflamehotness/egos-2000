@@ -217,6 +217,8 @@ void mmu_init() {
     /* Student's code goes here (System Call & Protection). */
 
     /* Setup PMP NAPOT region 0x80400000 - 0x80800000 as r/w/x */
+    asm("csrw pmpaddr0, %0" : : "r" (0x2017FFFF));
+    asm("csrw pmpcfg0, %0" : : "r" (0x1F));
 
     /* Student's code ends here. */
 

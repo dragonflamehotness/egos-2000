@@ -29,7 +29,6 @@
  
  static void intr_entry(uint);
  static void excp_entry(uint);
- ulonglong mtime_get();
  
  void kernel_entry(uint mcause) {
      /* With the kernel lock, only one core can enter this point at any time */
@@ -70,6 +69,11 @@
      }
      /* Student's code goes here (system call and memory exception).
       * Kill the process if curr_pid is a user application */
+    if (curr_pid >= GPID_USER_START) {
+        proc_set[curr_proc_idx].status = PROC_UNUSED;
+        INFO("process %d terminated with exception %d", curr_pid, id);
+        exit(1);
+    }
  
      /* Student's code ends here. */
      FATAL("excp_entry: kernel got exception %d", id);
@@ -166,6 +170,14 @@ static void wait_for_interrupt() {
 
     /* Modify mstatus.MPP to enter machine, supervisor, or user mode
      * after mret depending on whether curr_pid is a kernel process. */
+    uint mstatus;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    if (curr_pid < GPID_USER_START) {
+        mstatus = (mstatus & ~(0b11 << 11)) | (0b11 << 11);
+    } else {
+        mstatus = (mstatus & ~(0b11 << 11)) | (0b00 << 11);
+    }
+    asm("csrw mstatus, %0" ::"r"(mstatus));
 
     /* Student's code ends here. */
 
