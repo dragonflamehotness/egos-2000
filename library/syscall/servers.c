@@ -23,10 +23,34 @@
  }
  
  void sleep(int nticks) {
-     struct proc_request req;
-     req.type   = PROC_SLEEP;
-     sprintf(req.argv[0],"%ld", nticks);
-     sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+    struct proc_request req;
+    req.type   = PROC_SLEEP;
+    char nticks_str[12]; // Enough to hold a 32-bit integer and newline
+    int len = 0;
+    int temp = nticks;
+    if (nticks == 0) {
+        nticks_str[len++] = '0';
+    } else {
+        if (nticks < 0) {
+            nticks_str[len++] = '-';
+            temp = -temp;
+        }
+        int digits[10], i = 0;
+        while (temp > 0) {
+            digits[i++] = temp % 10;
+            temp /= 10;
+        }
+        while (i > 0) {
+            nticks_str[len++] = '0' + digits[--i];
+        }
+    }
+    nticks_str[len++] = '\n';
+    nticks_str[len++] = '\r';
+    nticks_str[len] = '\0';
+    strncpy(req.argv[0], nticks_str, sizeof(req.argv[0]) - 1);
+    req.argv[0][sizeof(req.argv[0]) - 1] = '\0';
+
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
  }
  /* To understand directory management, read tools/mkfs.c */
  int dir_lookup(int dir_ino, char* name) {

@@ -88,6 +88,17 @@
  
      FATAL("excp_entry: kernel got interrupt %d", id);
  }
+
+
+static void wait_for_interrupt() {
+    #define MSTATUS_MIE_POS 3
+    uint mstatus;
+    asm("csrr %0, mstatus":"=r"(mstatus));
+
+    mstatus |= (1 << MSTATUS_MIE_POS);
+    asm("csrw mstatus, %0"::"r"(mstatus));
+    asm("wfi");
+}
  
  static void proc_yield(uint id) {
      /* Set the current process status to RUNNABLE if it was RUNNING */
@@ -98,7 +109,7 @@
      /* Decrement sleep counters */
      for (uint i = 0; i < MAX_NPROCESS; i++) {
          if (proc_set[i].time > 0) {
-             proc_set[i].time-= mtime_get();
+             proc_set[i].time-= 1;
              if(proc_set[i].time < 0) {
                  proc_set[i].time = 0;
              }
@@ -135,36 +146,37 @@
      /* Student's code ends here*/
  
      /* Context switch */
-     curr_proc_idx = next_idx;
-     earth->timer_reset(core_in_kernel);
-     if (CORE_IDLE) {
-         /* Student's code goes here (multi-core and atomic instruction) */
- 
-         /* Release the kernel lock; Enable interrupts by modifying mstatus;
-          * Wait for the timer interrupt with while(1); */
- 
-         /* Student's code ends here. */
-         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
-     }
-     earth->mmu_switch(curr_pid);
-     earth->mmu_flush_cache();
- 
-     /* Student's code goes here (protection, virtual memory, and multi-core).
-      */
- 
-     /* Modify mstatus.MPP to enter machine, supervisor, or user mode
-      * after mret depending on whether curr_pid is a kernel process. */
- 
-     /* Student's code ends here. */
- 
-     /* Setup the entry point for a newly created process */
-     if (curr_status == PROC_READY) {
-         /* Set argc, argv and initial program counter */
-         proc_set[curr_proc_idx].saved_register[0] = APPS_ARG;
-         proc_set[curr_proc_idx].saved_register[1] = APPS_ARG + 4;
-         proc_set[curr_proc_idx].mepc              = APPS_ENTRY;
-     }
-     proc_set_running(curr_pid);
+    curr_proc_idx = next_idx;
+    earth->timer_reset(core_in_kernel);
+    if (CORE_IDLE) {
+        /* Student's code goes here (multi-core and atomic instruction) */
+
+        /* Release the kernel lock; Enable interrupts by modifying mstatus; */
+        /* Wait for a timer interrupt with the wfi instruction. */
+        wait_for_interrupt();
+
+        /* Student's code ends here. */
+        FATAL("proc_yield: no process to run on core %d", core_in_kernel);
+    }
+    earth->mmu_switch(curr_pid);
+    earth->mmu_flush_cache();
+
+    /* Student's code goes here (protection, virtual memory, and multi-core).
+     */
+
+    /* Modify mstatus.MPP to enter machine, supervisor, or user mode
+     * after mret depending on whether curr_pid is a kernel process. */
+
+    /* Student's code ends here. */
+
+    /* Setup the entry point for a newly created process */
+    if (curr_status == PROC_READY) {
+        /* Set argc, argv and initial program counter */
+        proc_set[curr_proc_idx].saved_register[0] = APPS_ARG;
+        proc_set[curr_proc_idx].saved_register[1] = APPS_ARG + 4;
+        proc_set[curr_proc_idx].mepc              = APPS_ENTRY;
+    }
+    proc_set_running(curr_pid);
  }
  
  void proc_sleep(int pid, int nticks) {
